@@ -48,7 +48,7 @@ class _FirstscreenState extends State<Firstscreen> {
           padding: const EdgeInsets.all(12.0),
           child: Container(
             
-            height: 130,
+            height: 120,
             width: double.infinity,
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Colors.black)),
              child: Padding(
@@ -61,6 +61,15 @@ class _FirstscreenState extends State<Firstscreen> {
                     children: [
                       Text("Name:" + (ds['Name']?? "N/A"),style: TextStyle(fontSize: 18,color: Colors.green,),),
                       Spacer(),
+                      GestureDetector(
+                        onTap: (){
+                          name.text=ds['Name'];
+                          age.text=ds['Age'];
+                          location.text=ds["Location"];
+                          EditEmployeeDetails(ds["Id"]);
+                        },
+                        child: Icon(Icons.edit),
+                      ),
                       IconButton(onPressed: ()async{
                       await Database.deleteEmployeeDetails(ds['Id']);
                       }, icon: Icon(Icons.delete))
@@ -88,7 +97,7 @@ class _FirstscreenState extends State<Firstscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Center(
           child: Text("Flutter Firebase"),
@@ -104,4 +113,58 @@ class _FirstscreenState extends State<Firstscreen> {
      },child:Icon(Icons.add) ,),
     );
   }
+  Future EditEmployeeDetails(String id)=>showDialog(context: context,builder: (context)=>AlertDialog(
+    content: Container(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(Icons.cancel),
+              ),
+              SizedBox(width: 60,),
+              Text('Edit'),
+              SizedBox(width: 5,),
+              Text("Details"),
+            ],
+            
+          ),
+          Text("Name"),
+          SizedBox(height: 8,),
+          TextFormField(
+            controller: name,
+            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+          ),
+           Text("Age"),
+          SizedBox(height: 8,),
+          TextFormField(
+            controller: age,
+            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+          ),
+           Text("Location"),
+          SizedBox(height: 8,),
+          TextFormField(
+            controller: location,
+            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+          ),
+          ElevatedButton(onPressed: ()async{
+            Map<String,dynamic>updateInfo={
+              "Name":name.text,
+              "Age":age.text,
+              "Id":id,
+              "Location":location.text,
+            };
+            await Database.updateEmployeeDetails(id, updateInfo).then((value){
+              Navigator.pop(context);
+            });
+          }, child: Text("Update")),
+        ],
+      ),
+      
+      
+    ),
+  ));
 }
